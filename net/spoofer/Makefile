@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=spoofer
-PKG_VERSION:=1.3.2
+PKG_VERSION:=1.3.3-alpha2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://www.caida.org/projects/spoofer/downloads
-PKG_HASH:=2f5076a4ddd749a26eb97f77bd02a6c69cba0f2527fd3ff2ba6d21ec7d3b4914
+PKG_HASH:=6d279979ea038f10e64af4c874a556d3fd7da7e853ca3f990660f210e1a48f01
 
 PKG_LICENSE:=GPL-3.0
 PKG_LICENSE_FILES:=LICENSE
@@ -70,10 +70,12 @@ endif
 define Package/spoofer/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/prober/spoofer-prober $(1)/usr/bin
+	$(INSTALL_BIN) $(SPOOFER_SRC)/openwrt-files/spoofer $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(SPOOFER_SRC)/openwrt-files/initscript $(1)/etc/init.d/spoofer
 	$(INSTALL_DIR) $(1)/usr/share/spoofer
 	$(INSTALL_DATA) $(SPOOFER_SRC)/gd_bundle.crt $(1)/usr/share/spoofer
+	$(INSTALL_DATA) $(SPOOFER_SRC)/openwrt-files/spoofer-lib.sh $(1)/usr/share/spoofer
 endef
 
 $(eval $(call BuildPackage,spoofer))
