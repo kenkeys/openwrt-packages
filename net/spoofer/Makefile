@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=spoofer
-PKG_VERSION:=1.3.3-alpha2
+PKG_VERSION:=1.3.3-alpha3
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://www.caida.org/projects/spoofer/downloads
-PKG_HASH:=6d279979ea038f10e64af4c874a556d3fd7da7e853ca3f990660f210e1a48f01
+PKG_HASH:=2a2cdb859030c25a43d719abe7ef8e2a79b26e622345ae9af63f2f9bf66a184b
 
 PKG_LICENSE:=GPL-3.0
 PKG_LICENSE_FILES:=LICENSE
@@ -33,39 +33,30 @@ define Package/spoofer
   MAINTAINER:=Ken Keys <spoofer-info@caida.org>
   DEPENDS:=+protobuf-lite +libpcap +libpthread +libopenssl
 endef
-# Note: to use standard ssl certs, add "+ca-certificates" to DEPENDS above
 
 define Package/spoofer/description
-  The spoofer client is part of a system to measure the Internet's resistance to packets with a spoofed (forged) source IP address.
+The spoofer client is part of a system to measure the Internet's resistance
+to packets with a spoofed (forged) source IP address.
+
+This package comes bundled with a small certificate file that allows secure
+communication with the spoofer server without depending on the large
+ca-certificates package.  But if the server's private certificate ever
+changes, it will be necessary to either install the ca-certificates package
+or install an updated version of this package that has a newer bundled
+certificate.
+
 endef
 
 CONFIGURE_ARGS += \
 	--enable-prober \
-	--disable-manager \
-	$(SPOOFER_CONFIGURE_ARGS)
+	--disable-manager
 
 CONFIGURE_VARS += \
 	PROTOC=$(STAGING_DIR_HOSTPKG)/bin/protoc
 
 EXTRA_CXXFLAGS += -std=gnu++14
 
-# If SPOOFER_VPATH is set, use sources in that directory instead of
-# downloading from PKG_SOURCE_URL.  (C.f. the openwrt USE_SOURCE_DIR
-# mechanism, which seems to incorrectly also apply to dependent packages, and
-# writes into the source dir (which is bad if source directory is readonly or
-# shared).)
-ifdef SPOOFER_VPATH
-  SPOOFER_SRC=$(SPOOFER_VPATH)
-  CONFIGURE_CMD=$(SPOOFER_VPATH)/configure
-  define Download
-	: do nothing
-  endef
-  define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-  endef
-else
-  SPOOFER_SRC=$(PKG_BUILD_DIR)
-endif
+SPOOFER_SRC=$(PKG_BUILD_DIR)
 
 define Package/spoofer/install
 	$(INSTALL_DIR) $(1)/usr/bin
